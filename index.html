@@ -119,9 +119,10 @@ footer{text-align:center;color:var(--muted);font-size:11.5px;padding:26px 0 6px}
 
         <div class="step" id="step2">
           <div class="stitle"><span class="n">2</span> Ataquen a otro grupo (opcional, repetible)</div>
-          <p>Elijan una empresa objetivo y anuncien una porción más específica de su bloque. +10 puntos cada vez que lo hagan.</p>
+          <p>Elijan una empresa objetivo, y luego ELIJAN CUÁL prefijo le ganaría — no es solo apretar un botón, tienen que acertar cuál es el "más específico". +10 puntos cada vez que acierten.</p>
           <select class="pick" id="targetPick"></select>
-          <button class="danger" id="hijackBtn">☠ Secuestrar ruta</button>
+          <button class="danger" id="hijackBtn">☠ Preparar ataque</button>
+          <div id="hijackQuiz" style="margin-top:12px"></div>
         </div>
 
         <div class="step" id="step3">
@@ -306,10 +307,23 @@ document.getElementById('announceBtn').onclick = async () => {
   await loadAll();
 };
 
-document.getElementById('hijackBtn').onclick = async () => {
-  const targetAs = parseInt(document.getElementById('targetPick').value, 10);
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function lessSpecific(prefix){
+  const [ip, len] = prefix.split('/');
+  const newLen = Math.max(parseInt(len,10) - 1, 1);
+  return `${ip}/${newLen}`;
+}
+
+async function doHijack(targetAs, fakePrefix){
   const target = COMPANIES.find(c => c.as === targetAs);
-  const fakePrefix = moreSpecific(target.prefix);
   const id = slugify(`${me.team}-${me.as}-hijack-${targetAs}-${Date.now()}`);
   await postSheet({
     kind: 'rutas', id,
@@ -320,6 +334,44 @@ document.getElementById('hijackBtn').onclick = async () => {
   document.getElementById('step2').classList.add('done');
   termHijack(me.as, fakePrefix, targetAs);
   await loadAll();
+}
+
+document.getElementById('hijackBtn').onclick = () => {
+  const targetAs = parseInt(document.getElementById('targetPick').value, 10);
+  const target = COMPANIES.find(c => c.as === targetAs);
+  const correct = moreSpecific(target.prefix);
+  const decoyA = target.prefix;              // misma especificidad -> no gana
+  const decoyB = lessSpecific(target.prefix); // MENOS especifica -> pierde peor todavia
+  const options = shuffle([correct, decoyA, decoyB]);
+
+  const quiz = document.getElementById('hijackQuiz');
+  quiz.innerHTML = `
+    <div class="rules" style="margin:0">
+      <p style="font-size:13px;margin:0 0 10px"><b>Pregunta:</b> AS${target.as} (${target.name}) tiene el bloque real <b>${target.prefix}</b>. ¿Cuál de estos prefijos deben anunciar ustedes para que la mayoría del tráfico se vaya hacia su ruta en vez de la real?</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap" id="quizOpts"></div>
+      <p id="quizFeedback" style="font-size:12.5px;margin-top:10px"></p>
+    </div>`;
+  const opts = document.getElementById('quizOpts');
+  options.forEach(opt => {
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = async () => {
+      const fb = document.getElementById('quizFeedback');
+      if(opt === correct){
+        fb.style.color = '#5ef29a';
+        fb.textContent = `✓ Correcto — ${opt} es MÁS específica que ${target.prefix}, le gana. Ejecutando el ataque...`;
+        await doHijack(targetAs, opt);
+        setTimeout(() => { quiz.innerHTML = ''; }, 2500);
+      } else if(opt === decoyA){
+        fb.style.color = '#ff8080';
+        fb.textContent = `✗ ${opt} es la MISMA especificidad que la real — empate, no gana sola. Prueben otra.`;
+      } else {
+        fb.style.color = '#ff8080';
+        fb.textContent = `✗ ${opt} es MENOS específica (un bloque más grande) — pierde contra la ruta real. Prueben otra.`;
+      }
+    };
+    opts.appendChild(b);
+  });
 };
 
 document.getElementById('checkBtn').onclick = async () => {
