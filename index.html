@@ -16,13 +16,11 @@ h1,h2,h3{font-family:'VT323',monospace;font-weight:400;letter-spacing:.02em}
 h1.big{font-size:clamp(26px,5vw,38px);color:var(--grn);margin:10px 0 6px;text-shadow:0 0 18px rgba(57,210,255,.3)}
 .lead{color:#bcd6ec;font-size:14px;line-height:1.55;max-width:800px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin-bottom:18px}
-/* gate / rules */
 #gate{padding:30px 26px}
 #gate input,#gate select{background:#040a12;border:1px solid var(--grn-dim);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:15px;padding:10px 14px;border-radius:7px;margin:8px 0;width:100%;max-width:420px}
 #gate .err{color:var(--red);font-size:12.5px;min-height:16px}
 .rules{border:1px solid var(--line);background:#040a12;border-radius:10px;padding:18px 22px;margin:14px 0}
 .rules h4{color:var(--amber);font-size:16px;margin:0 0 8px}
-.rules ol{margin:6px 0 0 18px;padding:0;font-size:13.5px;line-height:1.7}
 .rules .example{border-left:3px solid var(--grn-dim);padding:8px 14px;margin-top:10px;font-size:12.5px;color:#bcd6ec;background:#06111e}
 .goal{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
 .goalbox{flex:1;min-width:150px;border-radius:8px;padding:12px 14px;text-align:center;border:1px solid var(--line)}
@@ -43,58 +41,46 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .step.done .stitle .n{background:#1f7a4a}
 .step p{font-size:12.5px;color:var(--muted);margin:0 0 10px}
 select.pick{background:#040a12;border:1px solid var(--grn-dim);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;padding:9px 10px;border-radius:6px}
-table.bgp{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
-table.bgp th,table.bgp td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
-table.bgp th{color:var(--muted);font-size:10.5px;text-transform:uppercase}
-tr.hijack{background:#2a0a0a}
-tr.hijack td{color:#ffb3b3}
-tr.legit td{color:#bdf0ff}
-tr.caught td{color:#7a8aa0 !important; text-decoration:line-through; opacity:.6}
-.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700}
-.pill.ok{background:#0e3a22;color:#5ef29a}
-.pill.bad{background:#3a0e0e;color:#ff8080}
-.pill.caught{background:#2a2a2a;color:#9aa6b8}
-.alert{border:1px solid var(--red);background:#2a0a0a;border-radius:9px;padding:14px 16px;margin:10px 0;font-size:13px;color:#ffd0d0}
-.alert b{color:#ff8080}
-.board{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px}
-.board th,.board td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
-.board th{color:var(--muted);font-size:10.5px;text-transform:uppercase}
-.board tr.me{background:#0c2436}
 .termwrap{background:#000;border:1px solid #0e3a2a;border-radius:9px;padding:0;margin-top:14px;overflow:hidden}
 .termbar2{display:flex;align-items:center;gap:8px;background:#071a12;padding:7px 12px;font-size:11px;color:#5f9b70;border-bottom:1px solid #0e3a2a}
 .termbar2 .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
 .termbar2 .dr{background:#ff5f56}.termbar2 .dy{background:#ffbd2e}.termbar2 .dg{background:#27c93f}
-#termBody{height:220px;overflow-y:auto;padding:12px 14px;font-size:12.5px;line-height:1.55}
+#termBody{height:260px;overflow-y:auto;padding:12px 14px;font-size:12.5px;line-height:1.55}
 #termBody .ln{white-space:pre-wrap;word-break:break-word;margin-bottom:2px}
 #termBody .prompt{color:#39ff6a}
 #termBody .cmd{color:#d9ffe4}
 #termBody .out{color:#8fd4ff}
 #termBody .flag{color:#ff8080;font-weight:700}
 #termBody .note{color:#6fa8ff;font-style:italic}
+.scorepanel{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+.scorebox{flex:1;min-width:140px;border-radius:9px;padding:14px;text-align:center;border:1px solid var(--line);background:#06111e}
+.scorebox b{display:block;font-size:30px;color:var(--amber)}
+.scorebox span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.finalbox{border:1px solid var(--amber);background:#241a05;border-radius:10px;padding:16px 18px;margin-top:14px;font-size:13.5px;color:#ffe3a3}
 footer{text-align:center;color:var(--muted);font-size:11.5px;padding:26px 0 6px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <span class="tag">TEMA 5 · GESTIÓN DE RED BGP · JUEGO EN VIVO</span>
+  <span class="tag">TEMA 5 · GESTIÓN DE RED BGP · PRÁCTICA EN GRUPO</span>
   <h1 class="big">BGP Wars — Ataque y Defensa de Rutas</h1>
-  <p class="lead">Un juego en tiempo real entre todos los grupos de la clase. Gana el equipo con más puntos combinando ataque y defensa.</p>
+  <p class="lead">Cada grupo juega en su propia pantalla, sin depender de internet ni de nadie más. Al terminar, anoten su puntaje final en la hoja compartida de la clase.</p>
 
   <div id="gate" class="card">
     <div class="rules">
       <h4>🎯 El objetivo, en una frase</h4>
-      <p style="font-size:13.5px;margin:0 0 10px">Cada grupo es una empresa dueña de un bloque de direcciones de Internet. Ganan puntos <b style="color:var(--red)">robando tráfico ajeno</b> (atacando) y <b style="color:#5ef29a">detectando cuando les roban a ustedes</b> (defendiendo). Al final, gana quien sume más puntos.</p>
+      <p style="font-size:13.5px;margin:0 0 10px">Su grupo es una empresa dueña de un bloque de direcciones de Internet. Ganan puntos <b style="color:var(--red)">robando tráfico ajeno</b> (atacando) y <b style="color:#5ef29a">detectando cuando les roban a ustedes</b> (defendiendo). En ambos casos tienen que ACERTAR una pregunta, no solo apretar un botón.</p>
 
       <h4>¿Por qué funciona el "robo"? (la idea clave de BGP)</h4>
       <div class="example">
-        Imaginen un GPS. Si una app dice "ve a Santa Cruz" y otra dice "ve a Av. Cristo Redentor #123, Santa Cruz" — el GPS siempre prefiere la dirección más exacta. BGP (el protocolo que usa Internet) funciona igual: si alguien anuncia una dirección <b>más específica</b> que la real, todo el tráfico se va hacia esa ruta falsa, aunque no le pertenezca. Eso es un "secuestro de ruta" (hijacking) — y es justo lo que van a hacer en este juego.
+        Imaginen un GPS. Si una app dice "ve a Santa Cruz" y otra dice "ve a Av. Cristo Redentor #123, Santa Cruz" — el GPS siempre prefiere la dirección más exacta. BGP (el protocolo que usa Internet) funciona igual: si alguien anuncia una dirección <b>más específica</b> que la real, todo el tráfico se va hacia esa ruta falsa, aunque no le pertenezca. Eso es un "secuestro de ruta" (hijacking).
       </div>
 
       <h4>Cómo se gana puntos</h4>
       <div class="goal">
-        <div class="goalbox" style="border-color:#3a0f0f"><b>+10</b><span>por cada secuestro exitoso que hagan</span></div>
-        <div class="goalbox" style="border-color:#1f7a4a"><b>+15</b><span>por cada ataque que detecten y reporten a tiempo</span></div>
-        <div class="goalbox" style="border-color:var(--line)"><b>Meta</b><span>el equipo con más puntos al final de la clase gana</span></div>
+        <div class="goalbox" style="border-color:#3a0f0f"><b>+10</b><span>por cada secuestro donde acierten el prefijo correcto</span></div>
+        <div class="goalbox" style="border-color:#1f7a4a"><b>+15</b><span>por cada amenaza real que detecten correctamente</span></div>
+        <div class="goalbox" style="border-color:var(--line)"><b>Al final</b><span>anoten su puntaje total en la hoja de la clase</span></div>
       </div>
     </div>
 
@@ -108,7 +94,11 @@ footer{text-align:center;color:var(--muted);font-size:11.5px;padding:26px 0 6px}
   <div id="game" style="display:none">
     <div class="card">
       <span class="badge" id="meBadge"></span>
-      <span class="badge" id="scoreBadge" style="margin-left:8px;border-color:var(--amber);color:var(--amber)"></span>
+      <div class="scorepanel">
+        <div class="scorebox"><b id="atkScore">0</b><span>Ataque</span></div>
+        <div class="scorebox"><b id="defScore">0</b><span>Defensa</span></div>
+        <div class="scorebox" style="border-color:var(--amber)"><b id="totalScore">0</b><span>Total</span></div>
+      </div>
 
       <div class="steps">
         <div class="step" id="step1">
@@ -118,8 +108,8 @@ footer{text-align:center;color:var(--muted);font-size:11.5px;padding:26px 0 6px}
         </div>
 
         <div class="step" id="step2">
-          <div class="stitle"><span class="n">2</span> Ataquen a otro grupo (opcional, repetible)</div>
-          <p>Elijan una empresa objetivo, y luego ELIJAN CUÁL prefijo le ganaría — no es solo apretar un botón, tienen que acertar cuál es el "más específico". +10 puntos cada vez que acierten.</p>
+          <div class="stitle"><span class="n">2</span> Ataquen a una empresa (repetible)</div>
+          <p>Elijan un objetivo y luego ELIJAN CUÁL prefijo le ganaría — tienen que acertar cuál es el "más específico" para que el ataque se ejecute. +10 puntos cada acierto.</p>
           <select class="pick" id="targetPick"></select>
           <button class="danger" id="hijackBtn">☠ Preparar ataque</button>
           <div id="hijackQuiz" style="margin-top:12px"></div>
@@ -127,10 +117,14 @@ footer{text-align:center;color:var(--muted);font-size:11.5px;padding:26px 0 6px}
 
         <div class="step" id="step3">
           <div class="stitle"><span class="n">3</span> Revisen si LOS atacaron a ustedes</div>
-          <p>Busca en la tabla si alguien anunció una ruta más específica dentro de SU bloque. Si la encuentran y la reportan antes que nadie, +15 puntos.</p>
+          <p>Se simula una amenaza dentro de su propio bloque. Tienen que identificar CUÁL ruta es la amenaza real entre varias opciones. +15 puntos si aciertan.</p>
           <button class="gold" id="checkBtn">🛡 Revisar mi red</button>
-          <div id="alertZone"></div>
+          <div id="defendQuiz" style="margin-top:12px"></div>
         </div>
+      </div>
+
+      <div class="finalbox">
+        📝 Cuando terminen de practicar, anoten su puntaje <b>Total</b> de arriba en la hoja compartida que el profesor tiene proyectada — así se arma el marcador de toda la clase.
       </div>
     </div>
 
@@ -142,31 +136,14 @@ footer{text-align:center;color:var(--muted);font-size:11.5px;padding:26px 0 6px}
         <div id="termBody"><div class="ln note">// Al anunciar, atacar o revisar su red, aquí aparecerán los comandos reales.</div></div>
       </div>
     </div>
-
-    <div class="card">
-      <h3 style="margin-top:0;color:var(--text);font-size:20px">Tabla BGP global (en vivo)</h3>
-      <table class="bgp" id="bgpTable">
-        <thead><tr><th>AS</th><th>Empresa / Grupo</th><th>Prefijo anunciado</th><th>Estado</th></tr></thead>
-        <tbody></tbody>
-      </table>
-      <p id="emptyMsg" style="color:var(--muted);font-size:13px">Todavía no hay rutas anunciadas. ¡Sean los primeros!</p>
-      <div style="text-align:center;margin-top:10px"><button id="refreshBtn">🔄 Actualizar tabla</button></div>
-    </div>
-
-    <div class="card">
-      <h3 style="margin-top:0;color:var(--text);font-size:20px">🏆 Marcador general</h3>
-      <table class="board" id="boardTable">
-        <thead><tr><th>#</th><th>Grupo</th><th>AS</th><th>Ataque</th><th>Defensa</th><th>Total</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
   </div>
 
   <footer>Redes de Computadoras III (ITE-212) · Tema 5 — Gestión de red BGP · Docente: Ing. Iver Guerrero Ortiz</footer>
 </div>
 
 <script>
-// Empresas ficticias fijas: mismo set para cualquier grupo/día que juegue.
+// Empresas ficticias fijas. Todo el juego corre en esta misma pestaña,
+// sin servidores ni internet -- no hay nada que se pueda caer en vivo.
 const COMPANIES = [
   { as: 65010, name: "BancoAndino",        prefix: "200.10.20.0/24" },
   { as: 65020, name: "TelecomSur",         prefix: "200.10.40.0/24" },
@@ -178,29 +155,8 @@ const COMPANIES = [
   { as: 65080, name: "Grupo8Net",          prefix: "200.10.160.0/24" }
 ];
 
-// Mismo Apps Script que usa el Lab 3 (Google Sheets) -- sin login, sin Claude.
-// Pega aqui la URL /exec de tu despliegue (la misma del Lab 3 funciona, solo
-// actualiza el codigo .gs con la version que soporta "rutas" y "reportes").
-const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwuzzbEjURt7hOGz-ZbErps_l691XlurGByPaaU3HvoCghmcEUHmdqunH846Kh8jSe2SA/exec";
-
-let me = null; // { team, as, name, prefix, grupoNum }
-let pollTimer = null;
-
-async function postSheet(payload){
-  if(!SHEET_WEBAPP_URL) return false;
-  try {
-    await fetch(SHEET_WEBAPP_URL, { method: 'POST', body: JSON.stringify(payload) });
-    return true;
-  } catch(e) { console.warn('no se pudo guardar', e); return false; }
-}
-
-async function getSheet(kind){
-  if(!SHEET_WEBAPP_URL) return [];
-  try {
-    const res = await fetch(`${SHEET_WEBAPP_URL}?kind=${kind}&t=${Date.now()}`);
-    return await res.json();
-  } catch(e) { console.warn('no se pudo leer', e); return []; }
-}
+let me = null;                  // { team, as, name, prefix, grupoNum }
+let score = { attack: 0, defense: 0 };
 
 const asPick = document.getElementById('asPick');
 COMPANIES.forEach(c => {
@@ -210,13 +166,26 @@ COMPANIES.forEach(c => {
   asPick.appendChild(o);
 });
 
-function slugify(s){
-  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60) || 'grupo';
-}
-
 function moreSpecific(prefix){
   const [ip, len] = prefix.split('/');
   return `${ip}/${parseInt(len,10)+1}`;
+}
+function lessSpecific(prefix){
+  const [ip, len] = prefix.split('/');
+  return `${ip}/${Math.max(parseInt(len,10)-1, 1)}`;
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function renderScore(){
+  document.getElementById('atkScore').textContent = score.attack;
+  document.getElementById('defScore').textContent = score.defense;
+  document.getElementById('totalScore').textContent = score.attack + score.defense;
 }
 
 function termAppend(lines){
@@ -259,17 +228,15 @@ function termHijack(as, fakePrefix, victimAs){
   ]);
 }
 
-function termCheck(hasThreats){
+function termDefend(attackerAs, threatPrefix){
   termAppend([
-    { cls:'prompt', text: `root@kali:~# sudo vtysh -c "show bgp ipv4 unicast" | grep "/25"` },
-    { cls: hasThreats ? 'flag' : 'out', text: hasThreats
-        ? '*> una ruta mas especifica DENTRO de su bloque -- alguien los esta secuestrando'
-        : '(sin resultados -- por ahora nadie les secuestro nada)' },
-    { cls:'note', text: '' }
+    { cls:'prompt', text: `root@kali:~# sudo vtysh -c "show bgp ipv4 unicast" | grep "${threatPrefix.split('/')[1]}"` },
+    { cls:'flag',   text: `*> ${threatPrefix.padEnd(17)}0.0.0.0    AS${attackerAs}    <-- amenaza detectada y reportada` },
+    { cls:'note',   text: '' }
   ]);
 }
 
-document.getElementById('joinBtn').onclick = async () => {
+document.getElementById('joinBtn').onclick = () => {
   const name = document.getElementById('teamName').value.trim();
   if(!name){ document.getElementById('gateErr').textContent = 'Escriban el nombre del grupo.'; return; }
   const asNum = parseInt(asPick.value, 10);
@@ -279,9 +246,7 @@ document.getElementById('joinBtn').onclick = async () => {
   document.getElementById('game').style.display = 'block';
   document.getElementById('meBadge').textContent = `Ustedes: ${me.team} — AS${me.as} (${me.name}), bloque ${me.prefix}`;
   renderTargets();
-  await loadAll();
-  if(pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(loadAll, 6000); // refresca sola cada 6s para que vean lo de otros grupos
+  renderScore();
 };
 
 function renderTargets(){
@@ -295,59 +260,24 @@ function renderTargets(){
   });
 }
 
-document.getElementById('announceBtn').onclick = async () => {
-  const id = slugify(`${me.team}-${me.as}-legit`);
-  await postSheet({
-    kind: 'rutas', id,
-    as: me.as, company: me.name, team: me.team,
-    prefix: me.prefix, hijack: false, victim_as: '', caught: false, ts: Date.now()
-  });
+document.getElementById('announceBtn').onclick = () => {
   document.getElementById('step1').classList.add('done');
   termAnnounce(me.as, me.prefix, me.grupoNum);
-  await loadAll();
 };
 
-function shuffle(arr){
-  const a = arr.slice();
-  for(let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function lessSpecific(prefix){
-  const [ip, len] = prefix.split('/');
-  const newLen = Math.max(parseInt(len,10) - 1, 1);
-  return `${ip}/${newLen}`;
-}
-
-async function doHijack(targetAs, fakePrefix){
-  const target = COMPANIES.find(c => c.as === targetAs);
-  const id = slugify(`${me.team}-${me.as}-hijack-${targetAs}-${Date.now()}`);
-  await postSheet({
-    kind: 'rutas', id,
-    as: me.as, company: me.name, team: me.team,
-    prefix: fakePrefix, hijack: true, victim_as: targetAs, victim_name: target.name,
-    caught: false, ts: Date.now()
-  });
-  document.getElementById('step2').classList.add('done');
-  termHijack(me.as, fakePrefix, targetAs);
-  await loadAll();
-}
-
+// ---- Paso 2: atacar (pregunta antes de ejecutar) ----
 document.getElementById('hijackBtn').onclick = () => {
   const targetAs = parseInt(document.getElementById('targetPick').value, 10);
   const target = COMPANIES.find(c => c.as === targetAs);
   const correct = moreSpecific(target.prefix);
-  const decoyA = target.prefix;              // misma especificidad -> no gana
-  const decoyB = lessSpecific(target.prefix); // MENOS especifica -> pierde peor todavia
+  const decoyA = target.prefix;
+  const decoyB = lessSpecific(target.prefix);
   const options = shuffle([correct, decoyA, decoyB]);
 
   const quiz = document.getElementById('hijackQuiz');
   quiz.innerHTML = `
     <div class="rules" style="margin:0">
-      <p style="font-size:13px;margin:0 0 10px"><b>Pregunta:</b> AS${target.as} (${target.name}) tiene el bloque real <b>${target.prefix}</b>. ¿Cuál de estos prefijos deben anunciar ustedes para que la mayoría del tráfico se vaya hacia su ruta en vez de la real?</p>
+      <p style="font-size:13px;margin:0 0 10px"><b>Pregunta:</b> AS${target.as} (${target.name}) tiene el bloque real <b>${target.prefix}</b>. ¿Cuál de estos prefijos deben anunciar ustedes para ganarle?</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap" id="quizOpts"></div>
       <p id="quizFeedback" style="font-size:12.5px;margin-top:10px"></p>
     </div>`;
@@ -355,13 +285,16 @@ document.getElementById('hijackBtn').onclick = () => {
   options.forEach(opt => {
     const b = document.createElement('button');
     b.textContent = opt;
-    b.onclick = async () => {
+    b.onclick = () => {
       const fb = document.getElementById('quizFeedback');
       if(opt === correct){
         fb.style.color = '#5ef29a';
-        fb.textContent = `✓ Correcto — ${opt} es MÁS específica que ${target.prefix}, le gana. Ejecutando el ataque...`;
-        await doHijack(targetAs, opt);
-        setTimeout(() => { quiz.innerHTML = ''; }, 2500);
+        fb.textContent = `✓ Correcto — ${opt} es MÁS específica que ${target.prefix}, le gana.`;
+        score.attack += 10;
+        renderScore();
+        document.getElementById('step2').classList.add('done');
+        termHijack(me.as, opt, targetAs);
+        setTimeout(() => { quiz.innerHTML = ''; }, 2200);
       } else if(opt === decoyA){
         fb.style.color = '#ff8080';
         fb.textContent = `✗ ${opt} es la MISMA especificidad que la real — empate, no gana sola. Prueben otra.`;
@@ -374,128 +307,49 @@ document.getElementById('hijackBtn').onclick = () => {
   });
 };
 
-document.getElementById('checkBtn').onclick = async () => {
-  await loadAll();
-  renderAlerts();
-  const hasThreats = lastRows.some(r => r.hijack && r.victim_as === me.as && !r.caught);
-  termCheck(hasThreats);
-};
+// ---- Paso 3: defender (se simula una amenaza real; hay que identificarla) ----
+document.getElementById('checkBtn').onclick = () => {
+  const others = COMPANIES.filter(c => c.as !== me.as);
+  const attacker = others[Math.floor(Math.random() * others.length)];
+  const randomOther = others.filter(c => c.as !== attacker.as)[0] || others[0];
 
-document.getElementById('refreshBtn').onclick = loadAll;
+  const correct = moreSpecific(me.prefix);                 // amenaza real: dentro de SU bloque
+  const decoyA = moreSpecific(randomOther.prefix);          // mas especifica pero de OTRO bloque -> no les afecta a ellos
+  const decoyB = lessSpecific(me.prefix);                   // dentro de su familia pero menos especifica -> no gana
+  const options = shuffle([correct, decoyA, decoyB]);
 
-let lastRows = [];
-let lastReports = [];
-
-function toBool(v){ return v === true || v === 'TRUE' || v === 'true' || v === 1; }
-function toIntOrNull(v){ return (v === '' || v === null || v === undefined) ? null : parseInt(v, 10); }
-
-async function loadAll(){
-  const rutas = await getSheet('rutas');
-  lastRows = rutas
-    .map(r => ({
-      id: r.id, as: parseInt(r.as, 10), company: r.company, team: r.team,
-      prefix: r.prefix, hijack: toBool(r.hijack), victim_as: toIntOrNull(r.victim_as),
-      victim_name: r.victim_name, caught: toBool(r.caught), caught_by: r.caught_by,
-      ts: Number(r.ts) || 0
-    }))
-    .sort((a,b) => a.ts - b.ts);
-
-  lastReports = await getSheet('reportes');
-
-  renderTable();
-  renderBoard();
-  renderAlerts();
-}
-
-function renderTable(){
-  const tbody = document.querySelector('#bgpTable tbody');
-  tbody.innerHTML = '';
-  document.getElementById('emptyMsg').style.display = lastRows.length ? 'none' : 'block';
-  lastRows.forEach(r => {
-    const tr = document.createElement('tr');
-    tr.className = r.hijack ? (r.caught ? 'hijack caught' : 'hijack') : 'legit';
-    let estado;
-    if(!r.hijack) estado = `<span class="pill ok">legítima</span>`;
-    else if(r.caught) estado = `<span class="pill caught">detectado ✓</span>`;
-    else estado = `<span class="pill bad">⚠ MÁS ESPECÍFICA — gana sobre AS${r.victim_as}</span>`;
-    tr.innerHTML = `<td>AS${r.as}</td><td>${r.company} (${r.team})</td><td>${r.prefix}</td><td>${estado}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function renderAlerts(){
-  const zone = document.getElementById('alertZone');
-  zone.innerHTML = '';
-  const threats = lastRows.filter(r => r.hijack && r.victim_as === me.as && !r.caught);
-  if(threats.length === 0){
-    zone.innerHTML = `<p style="color:var(--muted);font-size:12.5px;margin-top:8px">Por ahora nadie les ha secuestrado rutas (o ya las atraparon todas).</p>`;
-    return;
-  }
-  threats.forEach(t => {
-    const div = document.createElement('div');
-    div.className = 'alert';
-    div.innerHTML = `<b>⚠ ¡Les secuestraron parte de su red!</b><br>
-      El grupo <b>${t.team}</b> (AS${t.as} — ${t.company}) anunció <b>${t.prefix}</b>, dentro de su bloque legítimo.<br><br>
-      <button class="gold" data-doc="${t.id}">Reportar a ${t.team} (+15 pts)</button>`;
-    zone.appendChild(div);
-  });
-  zone.querySelectorAll('button[data-doc]').forEach(btn => {
-    btn.onclick = async () => {
-      const docId = btn.getAttribute('data-doc');
-      const row = lastRows.find(r => r.id === docId);
-      if(!row) return;
-      btn.disabled = true;
-      btn.textContent = 'Reportando...';
-      await postSheet({ kind: 'rutas', id: docId, caught: true, caught_by: me.team });
-      await postSheet({
-        kind: 'reportes', id: slugify(docId + '-by-' + me.team),
-        reporter_team: me.team, reporter_as: me.as,
-        attacker_team: row.team, attacker_as: row.as, ts: Date.now()
-      });
-      termAppend([
-        { cls:'prompt', text: `root@kali:~# echo "Reportado: AS${row.as} (${row.team}) intentando secuestrar ${row.prefix}" >> incidentes.log` },
-        { cls:'out', text: `+15 pts de defensa para ${me.team}` },
-        { cls:'note', text: '' }
-      ]);
-      await loadAll();
+  const quiz = document.getElementById('defendQuiz');
+  quiz.innerHTML = `
+    <div class="rules" style="margin:0">
+      <p style="font-size:13px;margin:0 0 10px">Se detectaron varios anuncios en la tabla BGP. Su bloque real es <b>${me.prefix}</b>. ¿Cuál de estas rutas es una AMENAZA REAL contra ustedes?</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap" id="defOpts"></div>
+      <p id="defFeedback" style="font-size:12.5px;margin-top:10px"></p>
+    </div>`;
+  const opts = document.getElementById('defOpts');
+  options.forEach(opt => {
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = () => {
+      const fb = document.getElementById('defFeedback');
+      if(opt === correct){
+        fb.style.color = '#5ef29a';
+        fb.textContent = `✓ Correcto — ${opt} está DENTRO de su bloque y es más específica. Esa sí les roba tráfico.`;
+        score.defense += 15;
+        renderScore();
+        document.getElementById('step3').classList.add('done');
+        termDefend(attacker.as, correct);
+        setTimeout(() => { quiz.innerHTML = ''; }, 2200);
+      } else if(opt === decoyA){
+        fb.style.color = '#ff8080';
+        fb.textContent = `✗ ${opt} es más específica, pero está DENTRO del bloque de ${randomOther.name} (AS${randomOther.as}), no del suyo. No es su problema. Prueben otra.`;
+      } else {
+        fb.style.color = '#ff8080';
+        fb.textContent = `✗ ${opt} sí es parte de su familia de direcciones, pero es MENOS específica que su bloque real — no les gana nada. Prueben otra.`;
+      }
     };
+    opts.appendChild(b);
   });
-}
-
-function renderBoard(){
-  // puntos de ataque: secuestros NO atrapados todavía cuentan igual (el punto ya se ganó al hacerlo)
-  const attack = {};
-  lastRows.filter(r => r.hijack).forEach(r => {
-    const key = r.team + '|' + r.as;
-    attack[key] = (attack[key]||0) + 1;
-  });
-  // puntos de defensa: contar filas de "reportes" por reporter
-  const defense = {};
-  (lastReports || []).forEach(r => {
-    const key = r.reporter_team + '|' + r.reporter_as;
-    defense[key] = (defense[key]||0) + 1;
-  });
-
-  const teams = {};
-  Object.keys(attack).forEach(k => { teams[k] = teams[k] || {a:0,d:0}; teams[k].a = attack[k]; });
-  Object.keys(defense).forEach(k => { teams[k] = teams[k] || {a:0,d:0}; teams[k].d = defense[k]; });
-
-  const rows = Object.entries(teams).map(([k,v]) => {
-    const [team, as] = k.split('|');
-    const atkPts = v.a*10, defPts = v.d*15;
-    return { team, as, atkPts, defPts, total: atkPts+defPts };
-  }).sort((a,b) => b.total - a.total);
-
-  const board = document.querySelector('#boardTable tbody');
-  board.innerHTML = '';
-  rows.forEach((r,i) => {
-    const tr = document.createElement('tr');
-    if(me && r.team === me.team && r.as === me.as) tr.className = 'me';
-    tr.innerHTML = `<td>${i+1}</td><td>${r.team}</td><td>AS${r.as}</td><td>${r.atkPts}</td><td>${r.defPts}</td><td><b>${r.total}</b></td>`;
-    board.appendChild(tr);
-  });
-}
-
+};
 </script>
 </body>
 </html>
