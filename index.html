@@ -3,353 +3,590 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>BGP Wars</title>
+<title>Lab 3 · Simulador SNMP</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#020407;--panel:#0a0f1a;--line:#1f3a5a;--amber:#ffb400;--grn:#39d2ff;--grn-dim:#1f7aae;--red:#ff4d4d;--text:#dcecff;--muted:#5f7fa0}
+:root{--bg:#020402;--panel:#07100a;--line:#1f4d2a;--amber:#ffb400;--grn:#39ff6a;--grn-dim:#1fae4a;--red:#ff5d5d;--text:#d9ffe4;--muted:#5f9b70}
 *{box-sizing:border-box}
 html,body{margin:0;background:#000;color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh}
-body{background:radial-gradient(ellipse at 50% -10%,rgba(57,210,255,.08),transparent 60%),#020407}
+body{background:radial-gradient(ellipse at 50% -10%,rgba(57,255,106,.08),transparent 60%),#020402}
 h1,h2,h3{font-family:'VT323',monospace;font-weight:400;letter-spacing:.02em}
-.wrap{max-width:1100px;margin:auto;padding:22px 16px 60px}
+.wrap{max-width:1180px;margin:auto;padding:22px 16px 60px}
 .tag{display:inline-block;border:1px solid var(--grn-dim);color:var(--grn);padding:3px 10px;border-radius:3px;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
-h1.big{font-size:clamp(26px,5vw,38px);color:var(--grn);margin:10px 0 6px;text-shadow:0 0 18px rgba(57,210,255,.3)}
-.lead{color:#bcd6ec;font-size:14px;line-height:1.55;max-width:800px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin-bottom:18px}
-#gate{padding:30px 26px}
-#gate input,#gate select{background:#040a12;border:1px solid var(--grn-dim);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:15px;padding:10px 14px;border-radius:7px;margin:8px 0;width:100%;max-width:420px}
+.tag.exam{border-color:var(--amber);color:var(--amber)}
+.tag.cmd{border-color:#4aa3ff;color:#7cc1ff}
+h1.big{font-size:clamp(26px,5vw,36px);color:var(--grn);margin:10px 0 6px;text-shadow:0 0 18px rgba(57,255,106,.3)}
+.lead{color:#bfe8cb;font-size:14px;line-height:1.5;max-width:800px}
+.progress{display:flex;gap:6px;margin:16px 0 22px}
+.dotstep{flex:1;height:7px;border-radius:4px;background:#0c1a10;border:1px solid var(--line)}
+.dotstep.done{background:var(--grn-dim)}
+.dotstep.now{background:var(--amber);border-color:var(--amber)}
+.grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.termbar{display:flex;align-items:center;gap:8px;background:#0c1a10;border-bottom:1px solid var(--line);padding:8px 14px;font-size:12px;color:var(--muted)}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dot.r{background:#ff5f56}.dot.y{background:#ffbd2e}.dot.g{background:#27c93f}
+#screen{height:360px;overflow-y:auto;padding:16px;font-size:13.5px;line-height:1.55}
+#screen .l{white-space:pre-wrap;margin-bottom:2px}
+#screen .prompt{color:var(--grn)}
+#screen .out{color:#cbb98a}
+#screen .err{color:var(--red)}
+#screen .sys{color:var(--muted);font-style:italic}
+.inputrow{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:10px 14px;background:#010a04}
+.inputrow span{color:var(--grn)}
+.inputrow input{flex:1;background:transparent;border:none;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:14px;outline:none}
+.btnrow{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--line);background:#07100a;flex-wrap:wrap}
+button{cursor:pointer;font-family:'Share Tech Mono',monospace;border-radius:6px;border:1px solid var(--grn-dim);background:#0c1a10;color:var(--grn);padding:7px 12px;font-size:12.5px}
+button:hover{background:#13261a}
+button.hint{border-color:var(--amber);color:var(--amber)}
+button.primary{background:var(--grn-dim);color:#02140a;font-weight:700}
+button:disabled{opacity:.45;cursor:not-allowed}
+.panelhead{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.panelhead h3{margin:0;font-size:19px;color:var(--text)}
+#concepto{padding:16px;font-size:13.5px;line-height:1.65;color:#bfe8cb;min-height:300px}
+#concepto b{color:var(--amber)}
+#concepto h4{color:var(--grn);font-size:16px;margin:14px 0 4px}
+#concepto ul{margin:4px 0 10px 18px;padding:0}
+#concepto li{margin-bottom:5px}
+#concepto .fcaps{display:inline-block;margin-top:10px;border:1px dashed var(--grn-dim);padding:5px 10px;border-radius:6px;font-size:11.5px;color:var(--grn)}
+.stepsub{font-size:11.5px;color:var(--muted);padding:0 16px 12px}
+/* gate */
+#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:50px 20px}
+#gate input,#gate textarea{background:#010a04;border:1px solid var(--grn-dim);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:15px;padding:10px 14px;border-radius:7px;margin:10px 0;width:100%;max-width:420px}
+#gate input{text-align:center}
+#gate textarea{resize:vertical;min-height:60px;text-align:left}
 #gate .err{color:var(--red);font-size:12.5px;min-height:16px}
-.rules{border:1px solid var(--line);background:#040a12;border-radius:10px;padding:18px 22px;margin:14px 0}
-.rules h4{color:var(--amber);font-size:16px;margin:0 0 8px}
-.rules .example{border-left:3px solid var(--grn-dim);padding:8px 14px;margin-top:10px;font-size:12.5px;color:#bcd6ec;background:#06111e}
-.goal{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
-.goalbox{flex:1;min-width:150px;border-radius:8px;padding:12px 14px;text-align:center;border:1px solid var(--line)}
-.goalbox b{display:block;font-size:22px;color:var(--amber)}
-.goalbox span{font-size:11.5px;color:var(--muted)}
-button{cursor:pointer;font-family:'Share Tech Mono',monospace;border-radius:7px;border:1px solid var(--grn-dim);background:#0a1626;color:var(--grn);padding:11px 18px;font-size:13.5px}
-button:hover{background:#122236}
-button.primary{background:var(--grn-dim);color:#021018;font-weight:700}
-button.danger{background:#3a0f0f;border-color:var(--red);color:#ffb3b3}
-button.gold{background:#3a2a0a;border-color:var(--amber);color:var(--amber)}
-button:disabled{opacity:.4;cursor:not-allowed}
-.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--grn-dim);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--grn)}
-.steps{display:flex;flex-direction:column;gap:10px;margin-top:16px}
-.step{border:1px solid var(--line);border-radius:9px;padding:14px 16px;background:#06111e}
-.step.done{border-color:#1f7a4a;background:#06180f}
-.step .stitle{font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px}
-.step .stitle .n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--grn-dim);color:#021018;font-size:12px;font-weight:700}
-.step.done .stitle .n{background:#1f7a4a}
-.step p{font-size:12.5px;color:var(--muted);margin:0 0 10px}
-select.pick{background:#040a12;border:1px solid var(--grn-dim);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;padding:9px 10px;border-radius:6px}
-.termwrap{background:#000;border:1px solid #0e3a2a;border-radius:9px;padding:0;margin-top:14px;overflow:hidden}
-.termbar2{display:flex;align-items:center;gap:8px;background:#071a12;padding:7px 12px;font-size:11px;color:#5f9b70;border-bottom:1px solid #0e3a2a}
-.termbar2 .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
-.termbar2 .dr{background:#ff5f56}.termbar2 .dy{background:#ffbd2e}.termbar2 .dg{background:#27c93f}
-#termBody{height:260px;overflow-y:auto;padding:12px 14px;font-size:12.5px;line-height:1.55}
-#termBody .ln{white-space:pre-wrap;word-break:break-word;margin-bottom:2px}
-#termBody .prompt{color:#39ff6a}
-#termBody .cmd{color:#d9ffe4}
-#termBody .out{color:#8fd4ff}
-#termBody .flag{color:#ff8080;font-weight:700}
-#termBody .note{color:#6fa8ff;font-style:italic}
-.scorepanel{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
-.scorebox{flex:1;min-width:140px;border-radius:9px;padding:14px;text-align:center;border:1px solid var(--line);background:#06111e}
-.scorebox b{display:block;font-size:30px;color:var(--amber)}
-.scorebox span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.finalbox{border:1px solid var(--amber);background:#241a05;border-radius:10px;padding:16px 18px;margin-top:14px;font-size:13.5px;color:#ffe3a3}
+/* glosario */
+#glossary{display:none;margin-bottom:22px}
+.gsec{border:1px solid var(--line);background:#010a04;border-radius:10px;padding:18px 22px;margin-bottom:14px}
+.gsec h3{color:var(--grn);font-size:21px;margin:0 0 8px}
+.gsec h4{color:var(--amber);font-size:15px;margin:12px 0 4px}
+.gsec p,.gsec li{font-size:13.5px;line-height:1.6;color:var(--text)}
+.gsec ul{margin:4px 0 8px 18px;padding:0}
+.gsec .ej{color:#bfe8cb;font-style:italic}
+.fcapsgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:8px}
+.fcapsitem{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#07100a}
+.fcapsitem b{color:var(--grn);display:block;margin-bottom:4px;font-size:13px}
+.fcapsitem span{font-size:12px;color:#bfe8cb}
+/* quiz */
+#quizwrap{display:none;margin-top:26px}
+.qcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px}
+.qtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.qtop span{color:var(--muted);font-size:12px}
+#qtext{font-size:17px;color:var(--text);margin-bottom:16px;line-height:1.4}
+.opt{display:block;width:100%;text-align:left;background:#010a04;border:1px solid var(--line);color:var(--text);padding:12px 14px;margin-bottom:9px;border-radius:7px;font-size:13.5px}
+.opt:hover{border-color:var(--grn-dim)}
+.opt.correct{border-color:var(--grn);background:#06210f;color:var(--grn)}
+.opt.wrong{border-color:var(--red);background:#210606;color:#ffb3b3}
+#qexplain{display:none;border-left:3px solid var(--amber);background:#0c0a04;color:#cbb98a;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;margin-top:8px}
+#qscore{font-size:13px;color:var(--grn)}
+#finalcard{display:none;text-align:center;padding:30px}
+#finalcard h2{color:var(--amber);font-size:30px}
+.cta{border:1px solid var(--grn-dim);border-radius:10px;padding:16px 20px;margin-top:20px;background:#07100a;font-size:13.5px;color:#bfe8cb;text-align:left}
+.cta b{color:var(--grn)}
+table.board{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+table.board th,table.board td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
+table.board th{color:var(--muted);font-size:11px;text-transform:uppercase}
+table.board tr.me{background:#0c2014}
 footer{text-align:center;color:var(--muted);font-size:11.5px;padding:26px 0 6px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <span class="tag">TEMA 5 · GESTIÓN DE RED BGP · PRÁCTICA EN GRUPO</span>
-  <h1 class="big">BGP Wars — Ataque y Defensa de Rutas</h1>
-  <p class="lead">Cada grupo juega en su propia pantalla, sin depender de internet ni de nadie más. Al terminar, anoten su puntaje final en la hoja compartida de la clase.</p>
+  <span class="tag">LAB 3 · SIMULADOR · TEMA 3-4 · 2DO PARCIAL · 40 PTS</span>
+  <h1 class="big">Gestión de Red con SNMP — laboratorio en grupo</h1>
+  <p class="lead">Van a "correr" una terminal simulada: escriben el comando pedido (o usan el botón de ayuda) y leen la teoría al lado, con calma, antes de avanzar. Al final hay un repaso puntuado que combina teoría y comandos, y el resultado de su grupo queda en el tablero compartido de la clase.</p>
 
   <div id="gate" class="card">
-    <div class="rules">
-      <h4>🎯 El objetivo, en una frase</h4>
-      <p style="font-size:13.5px;margin:0 0 10px">Su grupo es una empresa dueña de un bloque de direcciones de Internet. Ganan puntos <b style="color:var(--red)">robando tráfico ajeno</b> (atacando) y <b style="color:#5ef29a">detectando cuando les roban a ustedes</b> (defendiendo). En ambos casos tienen que ACERTAR una pregunta, no solo apretar un botón.</p>
-
-      <h4>¿Por qué funciona el "robo"? (la idea clave de BGP)</h4>
-      <div class="example">
-        Imaginen un GPS. Si una app dice "ve a Santa Cruz" y otra dice "ve a Av. Cristo Redentor #123, Santa Cruz" — el GPS siempre prefiere la dirección más exacta. BGP (el protocolo que usa Internet) funciona igual: si alguien anuncia una dirección <b>más específica</b> que la real, todo el tráfico se va hacia esa ruta falsa, aunque no le pertenezca. Eso es un "secuestro de ruta" (hijacking).
-      </div>
-
-      <h4>Cómo se gana puntos</h4>
-      <div class="goal">
-        <div class="goalbox" style="border-color:#3a0f0f"><b>+10</b><span>por cada secuestro donde acierten el prefijo correcto</span></div>
-        <div class="goalbox" style="border-color:#1f7a4a"><b>+15</b><span>por cada amenaza real que detecten correctamente</span></div>
-        <div class="goalbox" style="border-color:var(--line)"><b>Al final</b><span>anoten su puntaje total en la hoja de la clase</span></div>
-      </div>
-    </div>
-
-    <h3 style="color:var(--grn);font-size:22px;margin:16px 0 6px">Elijan su equipo para entrar</h3>
-    <input id="teamName" type="text" placeholder="Nombre del grupo (ej: Grupo 3)" maxlength="40">
-    <select id="asPick"></select>
-    <div><button class="primary" id="joinBtn" style="margin-top:10px">Entrar al juego</button></div>
+    <h3 style="color:var(--grn);font-size:24px;margin:0 0 6px">Antes de empezar</h3>
+    <p class="lead" style="max-width:420px">Escriban el nombre de su grupo y los integrantes. Con eso se registra el resultado al final.</p>
+    <input id="teamInput" type="text" placeholder="Nombre del grupo (ej: Grupo 3)" maxlength="40">
+    <textarea id="membersInput" placeholder="Integrantes (nombre completo, uno por línea)"></textarea>
+    <button class="primary" id="startBtn">Continuar</button>
     <div class="err" id="gateErr"></div>
   </div>
 
-  <div id="game" style="display:none">
-    <div class="card">
-      <span class="badge" id="meBadge"></span>
-      <div class="scorepanel">
-        <div class="scorebox"><b id="atkScore">0</b><span>Ataque</span></div>
-        <div class="scorebox"><b id="defScore">0</b><span>Defensa</span></div>
-        <div class="scorebox" style="border-color:var(--amber)"><b id="totalScore">0</b><span>Total</span></div>
-      </div>
-
-      <div class="steps">
-        <div class="step" id="step1">
-          <div class="stitle"><span class="n">1</span> Anuncien su bloque legítimo</div>
-          <p>Esto los pone "en el mapa". Háganlo primero, antes de atacar a nadie.</p>
-          <button class="primary" id="announceBtn">📢 Anunciar mi ruta</button>
-        </div>
-
-        <div class="step" id="step2">
-          <div class="stitle"><span class="n">2</span> Ataquen a una empresa (repetible)</div>
-          <p>Elijan un objetivo y luego ELIJAN CUÁL prefijo le ganaría — tienen que acertar cuál es el "más específico" para que el ataque se ejecute. +10 puntos cada acierto.</p>
-          <select class="pick" id="targetPick"></select>
-          <button class="danger" id="hijackBtn">☠ Preparar ataque</button>
-          <div id="hijackQuiz" style="margin-top:12px"></div>
-        </div>
-
-        <div class="step" id="step3">
-          <div class="stitle"><span class="n">3</span> Revisen si LOS atacaron a ustedes</div>
-          <p>Se simula una amenaza dentro de su propio bloque. Tienen que identificar CUÁL ruta es la amenaza real entre varias opciones. +15 puntos si aciertan.</p>
-          <button class="gold" id="checkBtn">🛡 Revisar mi red</button>
-          <div id="defendQuiz" style="margin-top:12px"></div>
-        </div>
-      </div>
-
-      <div class="finalbox">
-        📝 Cuando terminen de practicar, anoten su puntaje <b>Total</b> de arriba en la hoja compartida que el profesor tiene proyectada — así se arma el marcador de toda la clase.
-      </div>
+  <div id="glossary">
+    <div class="card" style="padding:20px 22px">
+      <span class="tag">LEAN ESTO ANTES DE EMPEZAR</span>
+      <h1 class="big" style="margin-top:10px">Glosario — Gestión de Red con SNMP</h1>
+      <p class="lead">No va a haber explicación en vivo de este tema: todo lo que necesitan está aquí. Léanlo con calma en grupo antes de tocar la terminal — el repaso del final se basa en esto.</p>
     </div>
 
-    <div class="card">
-      <h3 style="margin-top:0;color:var(--text);font-size:20px">💻 Terminal — lo mismo que escribirían en su VM</h3>
-      <p style="color:var(--muted);font-size:12.5px;margin:0 0 8px">Cada botón de arriba corresponde a estos comandos reales de FRRouting (los mismos del laboratorio en su máquina virtual). Aquí los ven simulados, línea por línea.</p>
-      <div class="termwrap">
-        <div class="termbar2"><span class="dot dr"></span><span class="dot dy"></span><span class="dot dg"></span>&nbsp;bgp_wars@terminal</div>
-        <div id="termBody"><div class="ln note">// Al anunciar, atacar o revisar su red, aquí aparecerán los comandos reales.</div></div>
+    <div class="gsec">
+      <h3>1. ¿Qué es la Gestión de Red?</h3>
+      <p>Es el conjunto de actividades (herramientas, protocolos y procesos) para <b>monitorear, controlar y mantener</b> una red de datos: saber qué equipos hay, cómo están funcionando, detectar fallas antes de que el usuario se queje, y mantener la red segura.</p>
+      <p>El estándar más usado en el mundo real para hacer esto es <b>SNMP</b> (Simple Network Management Protocol).</p>
+    </div>
+
+    <div class="gsec">
+      <h3>2. El modelo FCAPS</h3>
+      <p>FCAPS organiza TODO lo que implica administrar una red en 5 áreas. Es un mapa mental que usan los administradores de redes reales:</p>
+      <div class="fcapsgrid">
+        <div class="fcapsitem"><b>F · Fault (Fallas)</b><span>Detectar, registrar y resolver fallas: un enlace caído, un servicio sin responder.</span></div>
+        <div class="fcapsitem"><b>C · Configuration</b><span>Llevar control de cómo está configurado cada equipo y sus cambios.</span></div>
+        <div class="fcapsitem"><b>A · Accounting</b><span>Registrar uso de recursos: quién consume cuánto ancho de banda, para facturar o auditar.</span></div>
+        <div class="fcapsitem"><b>P · Performance</b><span>Medir rendimiento: carga del procesador, memoria, tráfico — para anticipar problemas.</span></div>
+        <div class="fcapsitem"><b>S · Security</b><span>Proteger la red: credenciales, accesos, vulnerabilidades expuestas.</span></div>
       </div>
+      <p class="ej">Ejemplo: una community string "public" expuesta por defecto es un problema de <b>Security</b>. Un panel que muestra la carga del CPU en vivo es <b>Performance</b>.</p>
+    </div>
+
+    <div class="gsec">
+      <h3>3. Arquitectura de SNMP</h3>
+      <h4>Agente y Manager</h4>
+      <ul>
+        <li><b>Agente</b> (software <code>snmpd</code>): vive DENTRO de cada equipo a monitorear (router, switch, servidor, PC) y responde preguntas sobre ese equipo.</li>
+        <li><b>Manager</b> (herramientas <code>snmpget</code>, <code>snmpwalk</code>, o un software como un NOC Dashboard): hace las preguntas, generalmente desde un puesto central.</li>
+      </ul>
+      <h4>MIB y OID</h4>
+      <p>La <b>MIB</b> (Management Information Base) es el catálogo completo de datos que un agente puede entregar, organizado como un árbol. Cada dato tiene una dirección numérica única dentro de ese árbol: el <b>OID</b> (Object Identifier).</p>
+      <p class="ej">Ejemplo: el OID <code>1.3.6.1.2.1.1.5.0</code> siempre significa "nombre del equipo" (sysName), en cualquier dispositivo SNMP del mundo.</p>
+    </div>
+
+    <div class="gsec">
+      <h3>4. Community string y versiones de SNMP</h3>
+      <p>En SNMPv1 y v2c, la autenticación es una palabra simple llamada <b>community string</b> — no está cifrada, viaja "en texto plano".</p>
+      <ul>
+        <li><b>rocommunity</b> → solo lectura (Read-Only).</li>
+        <li><b>rwcommunity</b> → lectura y escritura (Read-Write) — mucho más riesgoso si se filtra.</li>
+      </ul>
+      <p>"public" es la community de solo lectura que viene por defecto en miles de equipos reales — un hallazgo típico de seguridad.</p>
+      <p><b>SNMPv3</b> corrige esta debilidad: agrega autenticación de usuario real y cifrado del tráfico.</p>
+    </div>
+
+    <div class="gsec">
+      <h3>5. Puertos y formas de consultar</h3>
+      <ul>
+        <li><b>UDP 161</b> — el Manager pregunta al Agente (consultas normales: snmpget, snmpwalk).</li>
+        <li><b>UDP 162</b> — el Agente avisa al Manager por su cuenta (traps / alarmas).</li>
+      </ul>
+      <h4>Polling vs. Traps</h4>
+      <p><b>Polling</b>: el Manager pregunta repetidamente, cada cierto tiempo (así funciona un dashboard que se actualiza solo). <b>Traps</b>: el Agente notifica espontáneamente cuando pasa algo importante, sin esperar que le pregunten.</p>
+      <h4>get vs. walk</h4>
+      <p><b>snmpget</b> trae un solo valor puntual. <b>snmpwalk</b> recorre todo un subárbol de una vez.</p>
+    </div>
+
+    <div class="gsec">
+      <h3>6. Herramientas complementarias (para saber que existen)</h3>
+      <ul>
+        <li><b>Grafana</b>: arma dashboards visuales bonitos a partir de datos ya recolectados (no habla SNMP directamente).</li>
+        <li><b>LibreNMS / Zabbix</b>: plataformas completas de monitoreo que sí hablan SNMP y descubren equipos automáticamente.</li>
+        <li><b>Prometheus + snmp_exporter</b>: combinación moderna que traduce SNMP a un formato que Prometheus/Grafana entienden.</li>
+      </ul>
+    </div>
+
+    <div style="text-align:center;margin:10px 0 28px">
+      <button class="primary" id="glossaryDoneBtn" style="font-size:14px;padding:12px 26px">Ya lo leímos — empezar el laboratorio →</button>
     </div>
   </div>
 
-  <footer>Redes de Computadoras III (ITE-212) · Tema 5 — Gestión de red BGP · Docente: Ing. Iver Guerrero Ortiz</footer>
+  <div id="labArea" style="display:none">
+  <div class="progress" id="progress"></div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="termbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;kali@laboratorio:~$ &nbsp;<span id="stepcount" style="margin-left:auto"></span></div>
+      <div id="screen"></div>
+      <div class="inputrow">
+        <span>$</span>
+        <input id="cmdinput" type="text" placeholder="escribe el comando y presiona Enter..." autocomplete="off">
+      </div>
+      <div class="btnrow">
+        <button class="hint" id="hintBtn">💡 Ver comando</button>
+        <button id="skipBtn">⏭ Saltar paso</button>
+        <button id="resetBtn">↺ Reiniciar simulación</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="panelhead"><h3 id="concTitle">Concepto</h3></div>
+      <div class="stepsub" id="concSub"></div>
+      <div id="concepto"></div>
+    </div>
+  </div>
+
+  <div id="quizwrap">
+    <div class="qcard" id="qcard">
+      <div class="qtop"><h2 style="margin:0;color:var(--grn);font-size:22px">Repaso puntuado</h2><span id="qscore"></span></div>
+      <div id="qtext"></div>
+      <div id="qoptions"></div>
+      <div id="qexplain"></div>
+      <div style="text-align:right;margin-top:14px"><button class="primary" id="nextQBtn" style="display:none">Siguiente →</button></div>
+    </div>
+    <div class="qcard" id="finalcard">
+      <h2>¡Laboratorio completado!</h2>
+      <p id="finalscore" style="font-size:16px;color:var(--text)"></p>
+      <div class="cta">
+        <b>Tarea para casa:</b> repitan estos mismos comandos de verdad en su propio Kali Linux, contra <b>localhost / 127.0.0.1</b>. Usen la guía de laboratorio que ya les compartió el docente.
+      </div>
+      <div id="boardWrap" class="cta" style="display:none">
+        <b>Tablero del curso (en vivo)</b>
+        <table class="board" id="boardTable"><thead><tr><th>#</th><th>Grupo</th><th>Puntos /40</th></tr></thead><tbody></tbody></table>
+        <div style="text-align:center;margin-top:10px"><button id="refreshBoard">🔄 Actualizar tablero</button></div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <footer>Redes de Computadoras III (ITE-212) · Grupo A · Docente: Ing. Iver Guerrero Ortiz</footer>
 </div>
 
 <script>
-// Empresas ficticias fijas. Todo el juego corre en esta misma pestaña,
-// sin servidores ni internet -- no hay nada que se pueda caer en vivo.
-const COMPANIES = [
-  { as: 65010, name: "BancoAndino",        prefix: "200.10.20.0/24" },
-  { as: 65020, name: "TelecomSur",         prefix: "200.10.40.0/24" },
-  { as: 65030, name: "DataCenterValle",    prefix: "200.10.60.0/24" },
-  { as: 65040, name: "ISP Cumbre",         prefix: "200.10.80.0/24" },
-  { as: 65050, name: "ComercioNet",        prefix: "200.10.100.0/24" },
-  { as: 65060, name: "SaludConecta",       prefix: "200.10.120.0/24" },
-  { as: 65070, name: "Grupo7Net",          prefix: "200.10.140.0/24" },
-  { as: 65080, name: "Grupo8Net",          prefix: "200.10.160.0/24" }
+let claudeDb = null;
+(async () => {
+  try { claudeDb = (window.claude && window.claude.use) ? await window.claude.use("db") : null; }
+  catch(e) { claudeDb = null; }
+})();
+
+const steps = [
+  {
+    cmd: "sudo apt install snmpd snmp -y",
+    match: s => s.includes("apt") && s.includes("install") && s.includes("snmp"),
+    out: [
+      {t:"sys", text:"Leyendo listas de paquetes... Hecho"},
+      {t:"out", text:"snmpd is already the newest version (5.9.3+dfsg-...)"},
+      {t:"out", text:"snmp is already the newest version (5.9.3+dfsg-...)"}
+    ],
+    title: "Agente vs. Manager",
+    sub: "Paso 1 de 7 · Instalación",
+    html: `<h4>Dos piezas, dos roles</h4>
+    <ul>
+      <li><b>snmpd</b> → el <b>AGENTE</b>. Es un servicio que vive dentro de UN equipo (router, switch, servidor, PC) y sabe responder preguntas sobre ese equipo: cuánta memoria usa, cuánto tráfico pasa por su interfaz, hace cuánto está encendido, etc.</li>
+      <li><b>snmp</b> → las herramientas del <b>MANAGER</b>. Es lo que usa el administrador de red para preguntar: <code>snmpget</code>, <code>snmpwalk</code>, <code>snmpset</code>.</li>
+    </ul>
+    <h4>Analogía</h4>
+    <p>El Agente es como un empleado de una sucursal que SÍ conoce todos los datos de su local. El Manager es la gerencia central que llama a cada sucursal para pedir el reporte. SNMP es el "idioma" con el que se hace esa llamada.</p>
+    <p>En este laboratorio, tu propia máquina hace los dos papeles a la vez: se pregunta a sí misma (por eso usamos <code>localhost</code>).</p>
+    <div class="fcaps">Arquitectura cliente-servidor de SNMP</div>`
+  },
+  {
+    cmd: "sudo systemctl status snmpd",
+    match: s => s.includes("systemctl") && s.includes("snmpd"),
+    out: [
+      {t:"out", text:"● snmpd.service - Simple Network Management Protocol (SNMP) Daemon."},
+      {t:"out", text:"     Loaded: loaded (/lib/systemd/system/snmpd.service; enabled)"},
+      {t:"out", text:"     Active: active (running) since Wed 2026-10-14 08:05:12 -04"}
+    ],
+    title: "El agente queda escuchando",
+    sub: "Paso 2 de 7 · Arranque del servicio",
+    html: `<h4>Instalado ≠ corriendo</h4>
+    <p>Un programa instalado no hace nada todavía. Hay que <b>arrancar el servicio</b> para que quede corriendo en segundo plano, escuchando preguntas.</p>
+    <ul>
+      <li><code>systemctl start snmpd</code> → lo enciende.</li>
+      <li><code>systemctl status snmpd</code> → confirma si quedó <b>Active: active (running)</b>.</li>
+    </ul>
+    <h4>¿Dónde escucha?</h4>
+    <p>En el puerto <b>UDP 161</b>, por defecto. Si ese puerto estuviera cerrado o el servicio detenido, ninguna consulta SNMP tendría respuesta — como llamar a un teléfono apagado.</p>
+    <div class="fcaps">Puerto UDP 161 = canal de consultas del agente</div>`
+  },
+  {
+    cmd: "snmpwalk -v2c -c public localhost",
+    match: s => s.includes("snmpwalk"),
+    out: [
+      {t:"out", text:"iso.3.6.1.2.1.1.1.0 = STRING: \"Linux kali 6.x #1 SMP x86_64 GNU/Linux\""},
+      {t:"out", text:"iso.3.6.1.2.1.1.3.0 = Timeticks: (182340) 0:30:23.40"},
+      {t:"out", text:"iso.3.6.1.2.1.1.5.0 = STRING: \"kali\""},
+      {t:"out", text:"iso.3.6.1.2.1.1.6.0 = STRING: \"Aula de Redes\""},
+      {t:"sys",  text:"... (continúa) ..."},
+      {t:"err",  text:"No more variables left in this MIB View (It is past the end of the MIB tree)"}
+    ],
+    title: "MIB y OID",
+    sub: "Paso 3 de 7 · Consulta masiva",
+    html: `<h4>La MIB: un árbol de información</h4>
+    <p><b>MIB</b> (Management Information Base) es el "catálogo" de todos los datos que un agente puede entregar, organizado como un árbol de carpetas.</p>
+    <h4>El OID: la dirección dentro del árbol</h4>
+    <p>Cada dato tiene una dirección numérica única, el <b>OID</b> (Object Identifier). Por ejemplo <code>1.3.6.1.2.1.1.5.0</code> siempre significa "nombre del equipo" (sysName), en CUALQUIER dispositivo SNMP del mundo — un router Cisco, un switch HP, tu Kali.</p>
+    <h4>¿Qué hace snmpwalk?</h4>
+    <p>"Camina" por todo el árbol desde un punto de partida, trayendo todo lo que encuentra — útil para explorar, pero pesado si solo necesitas un dato puntual (eso lo verán en el paso 7).</p>
+    <div class="fcaps">FCAPS: esto alimenta Configuration y Performance</div>`
+  },
+  {
+    cmd: "sudo cat /etc/snmp/snmpd.conf | grep community",
+    match: s => s.includes("community") && (s.includes("cat") || s.includes("grep")),
+    out: [
+      {t:"out", text:"rocommunity  public  default    -V systemonly"}
+    ],
+    title: "La community string",
+    sub: "Paso 4 de 7 · Seguridad",
+    html: `<h4>Una contraseña muy básica</h4>
+    <p>En SNMPv1 y v2c, la "contraseña" se llama <b>community string</b>. No es cifrada ni robusta — es casi un acuerdo de caballeros.</p>
+    <ul>
+      <li><b>ro</b>community → Read-Only: solo lectura.</li>
+      <li><b>rw</b>community → Read-Write: además permite escribir/cambiar configuración remotamente.</li>
+    </ul>
+    <h4>Por qué esto importa</h4>
+    <p>"public" viene por defecto en miles de equipos reales en el mundo, sin que nadie la cambie. Si un atacante la adivina (no hay mucho que adivinar: es "public"), puede leer — o peor, si fuera rw, modificar — el equipo.</p>
+    <p>Por eso, en redes reales siempre se recomienda SNMPv3, que sí cifra y autentica.</p>
+    <div class="fcaps">FCAPS: esto es Security — credencial débil expuesta</div>`
+  },
+  {
+    cmd: "nmap -sU -p161 --script snmp-info localhost",
+    match: s => s.includes("nmap") && s.includes("161"),
+    out: [
+      {t:"sys", text:"Starting Nmap... "},
+      {t:"out", text:"PORT    STATE SERVICE"},
+      {t:"out", text:"161/udp open  snmp"},
+      {t:"out", text:"| snmp-info:"},
+      {t:"out", text:"|   enterprise: net-snmp"},
+      {t:"out", text:"|_  engine ID Data: ..."}
+    ],
+    title: "La vista de un atacante (o un auditor)",
+    sub: "Paso 5 de 7 · Reconocimiento",
+    html: `<h4>Escaneo sin contraseña</h4>
+    <p>Este comando NO necesita conocer la community string. Solo confirma que el puerto <b>161/UDP</b> está abierto y que ahí responde un agente SNMP — es el primer paso típico de un reconocimiento de red (reconnaissance), sea para una auditoría legítima o para un ataque.</p>
+    <h4>¿Por qué UDP y no TCP?</h4>
+    <p>TCP exige un "apretón de manos" (SYN/SYN-ACK/ACK) antes de cada intercambio. SNMP prioriza velocidad sobre garantía de entrega, porque en una red real hay que consultar miles de dispositivos muy seguido — UDP es más liviano y rápido, aunque algún paquete se pueda perder.</p>
+    <div class="fcaps">FCAPS: paso previo típico de un pentest/auditoría de red</div>`
+  },
+  {
+    cmd: "snmpget -v2c -c public localhost sysName.0",
+    match: s => s.includes("snmpget") && s.includes("sysname"),
+    out: [
+      {t:"err", text:"MIB search path: /root/.snmp/mibs:/usr/share/snmp/mibs"},
+      {t:"err", text:"Unknown Object Identifier (Sub-id not found: (top) -> sysName)"}
+    ],
+    title: "¿Por qué falló esto?",
+    sub: "Paso 6 de 7 · El nombre necesita diccionario",
+    html: `<h4>Nombre vs. número</h4>
+    <p><code>sysName.0</code> es un <b>nombre simbólico</b>, no el dato real. Para traducir ese nombre al OID numérico correspondiente, el sistema necesita un diccionario instalado: el paquete <code>snmp-mibs-downloader</code> (las MIBs).</p>
+    <h4>La analogía de la cédula</h4>
+    <p>Llamar a alguien por su <b>apodo</b> solo funciona si quien escucha ya sabe a quién te refieres (necesita el "diccionario"). Llamar por su <b>número de cédula</b> funciona siempre, lo conozcas o no de nombre.</p>
+    <p>El <b>OID numérico</b> es la cédula: siempre funciona, con o sin diccionario instalado. El <b>nombre</b> es el apodo: solo funciona si las MIBs están cargadas.</p>
+    <div class="fcaps">Lección clave: el OID numérico nunca falla</div>`
+  },
+  {
+    cmd: "snmpget -v2c -c public localhost 1.3.6.1.2.1.1.5.0",
+    match: s => s.includes("snmpget") && (s.includes("1.3.6.1.2.1.1.5.0")),
+    out: [
+      {t:"out", text:"iso.3.6.1.2.1.1.5.0 = STRING: \"kali\""}
+    ],
+    title: "Consulta puntual exitosa",
+    sub: "Paso 7 de 7 · Cierre",
+    html: `<h4>get vs. walk</h4>
+    <p>A diferencia de <code>snmpwalk</code> (todo el árbol de una vez), <code>snmpget</code> trae <b>un solo valor puntual</b> — mucho más liviano.</p>
+    <h4>Esto es "polling"</h4>
+    <p>Un panel de monitoreo (como el NOC Dashboard que vieron en vivo) hace exactamente esto, una y otra vez, cada pocos segundos: pregunta por 4 o 5 OIDs puntuales (carga, memoria, tráfico) para graficar cómo cambian en el tiempo. Eso se llama <b>polling</b>.</p>
+    <p>La alternativa al polling son los <b>traps</b> (puerto UDP 162): en vez de que el manager pregunte todo el tiempo, el agente avisa por su cuenta cuando pasa algo importante (una alarma).</p>
+    <div class="fcaps">FCAPS: Performance — monitoreo continuo por polling</div>`
+  }
 ];
 
-let me = null;                  // { team, as, name, prefix, grupoNum }
-let score = { attack: 0, defense: 0 };
+const quiz = [
+  {cat:"exam", q:"¿Qué significa que snmpd use 'rocommunity' en vez de 'rwcommunity'?", opts:["Que el agente solo permite lectura, no escritura","Que el puerto está cerrado","Que usa SNMPv3 obligatoriamente","Que no necesita contraseña"], correct:0,
+   exp:"'ro' = read-only. Con rwcommunity, además de leer, se podría modificar configuración del equipo remotamente — mucho más riesgoso."},
+  {cat:"exam", q:"¿Qué es un OID?", opts:["La contraseña del agente","Una dirección numérica única dentro del árbol de la MIB","El puerto UDP del agente","El nombre del fabricante del equipo"], correct:1,
+   exp:"El OID (Object Identifier) es como la 'ruta de archivo' de un dato específico dentro de la MIB — siempre el mismo número en cualquier equipo SNMP."},
+  {cat:"exam", q:"¿Por qué SNMP usa UDP y no TCP?", opts:["TCP no existe en redes antiguas","UDP es más liviano/rápido y se adapta mejor a consultar miles de dispositivos","UDP encripta mejor los datos","No se puede usar TCP en el puerto 161"], correct:1,
+   exp:"UDP evita el 'apretón de manos' de TCP en cada consulta, lo que lo hace más eficiente para monitoreo masivo y frecuente."},
+  {cat:"exam", q:"En el área FCAPS, ¿dónde ubicarías el problema de la community 'public' expuesta por defecto?", opts:["Fault (Fallas)","Accounting (Contabilidad)","Security (Seguridad)","Performance (Rendimiento)"], correct:2,
+   exp:"Una credencial débil o por defecto es, ante todo, un problema de Seguridad (la 'S' de FCAPS)."},
+  {cat:"exam", q:"¿Cuál es la diferencia principal entre polling y traps en SNMP?", opts:["El polling usa TCP y los traps usan UDP","En el polling el manager pregunta seguido; en los traps el agente avisa por su cuenta","Los traps solo existen en SNMPv1","El polling no necesita community string"], correct:1,
+   exp:"Polling = el manager consulta periódicamente (puerto 161). Traps = el agente notifica espontáneamente cuando pasa algo (puerto 162)."},
+  {cat:"exam", q:"¿Qué ventaja real tiene SNMPv3 frente a v1/v2c?", opts:["Es más rápido","Agrega autenticación y cifrado, no solo una community string en texto plano","No necesita un agente instalado","Funciona solo con IPv6"], correct:1,
+   exp:"SNMPv3 incorpora autenticación de usuario y cifrado del tráfico, resolviendo la debilidad de la community string plana."},
+  {cat:"cmd", q:"¿Qué hace snmpwalk que snmpget NO hace?", opts:["Recorre todo un subárbol de OIDs de una vez","Solo sirve para routers","Necesita instalar MIBs siempre","Funciona solo por TCP"], correct:0,
+   exp:"snmpwalk 'camina' por todo el árbol a partir de un punto; snmpget trae exactamente un solo valor puntual."},
+  {cat:"cmd", q:"snmpget con 'sysName.0' falla pero con '1.3.6.1.2.1.1.5.0' funciona. ¿Por qué?", opts:["Son OIDs distintos","El nombre necesita un diccionario MIB cargado que el número no necesita","El número es más nuevo","sysName.0 está mal escrito siempre"], correct:1,
+   exp:"El número es el dato real en el árbol; el nombre es solo un 'apodo' que requiere tener las MIBs (diccionario) instaladas para traducirse."},
+  {cat:"cmd", q:"¿Qué comando confirma si el puerto 161/UDP está abierto, sin necesidad de la community string?", opts:["snmpget","snmpwalk","nmap -sU -p161","systemctl status snmpd"], correct:2,
+   exp:"nmap escanea el puerto y detecta el servicio SNMP sin necesitar autenticarse — solo mira si el puerto responde."},
+  {cat:"cmd", q:"¿Qué paquete instala las herramientas de MANAGER (snmpget, snmpwalk)?", opts:["snmpd","snmp","snmp-mibs-downloader","net-tools"], correct:1,
+   exp:"'snmpd' es el agente (servidor); 'snmp' trae las herramientas de consulta que usa el manager."},
+  {cat:"cmd", q:"¿Qué comando muestra si el servicio del agente está corriendo?", opts:["snmpget -v2c -c public localhost","sudo systemctl status snmpd","nmap -p161","snmpwalk -v1"], correct:1,
+   exp:"systemctl status muestra el estado del servicio (Active: active/running, o detenido)."},
+  {cat:"cmd", q:"Un NOC Dashboard que actualiza su gráfico cada 2 segundos, ¿qué comando SNMP se parece más a lo que hace por detrás?", opts:["snmpwalk completo cada vez","snmpget a unos pocos OIDs puntuales, repetido en el tiempo (polling)","nmap cada segundo","systemctl restart snmpd"], correct:1,
+   exp:"El polling de un dashboard es, en esencia, muchos snmpget pequeños y frecuentes a los mismos OIDs."}
+];
 
-const asPick = document.getElementById('asPick');
-COMPANIES.forEach(c => {
-  const o = document.createElement('option');
-  o.value = c.as;
-  o.textContent = `AS${c.as} — ${c.name} (${c.prefix})`;
-  asPick.appendChild(o);
+// Pega aquí la URL de implementación ("Web App URL") de tu Apps Script,
+// algo como https://script.google.com/macros/s/XXXXX/exec — mientras esté
+// vacío, el envío a Sheets simplemente no ocurre y todo lo demás sigue igual.
+const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwuzzbEjURt7hOGz-ZbErps_l691XlurGByPaaU3HvoCghmcEUHmdqunH846Kh8jSe2SA/exec";
+
+let teamName = "", teamMembers = "";
+let si = 0, qi = 0, score = 0;
+const screen = document.getElementById('screen');
+const progress = document.getElementById('progress');
+const input = document.getElementById('cmdinput');
+
+document.getElementById('startBtn').onclick = () => {
+  const v = document.getElementById('teamInput').value.trim();
+  if(!v){ document.getElementById('gateErr').textContent = 'Escriban el nombre del grupo para continuar.'; return; }
+  teamName = v;
+  teamMembers = document.getElementById('membersInput').value.trim();
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('glossary').style.display = 'block';
+  document.getElementById('glossary').scrollIntoView({behavior:'smooth'});
+};
+document.getElementById('glossaryDoneBtn').onclick = () => {
+  document.getElementById('glossary').style.display = 'none';
+  document.getElementById('labArea').style.display = 'block';
+  document.getElementById('labArea').scrollIntoView({behavior:'smooth'});
+  println('sys', `=== Lab 3 — Simulador SNMP · Grupo: ${teamName} ===`);
+  loadStep();
+};
+
+function renderProgress(){
+  progress.innerHTML = '';
+  for(let i=0;i<steps.length;i++){
+    const d = document.createElement('div');
+    d.className = 'dotstep' + (i < si ? ' done' : i === si ? ' now' : '');
+    progress.appendChild(d);
+  }
+  document.getElementById('stepcount').textContent = si < steps.length ? `paso ${si+1}/${steps.length}` : 'completado';
+}
+
+function println(cls, text){
+  const d = document.createElement('div');
+  d.className = 'l ' + cls;
+  d.textContent = text;
+  screen.appendChild(d);
+  screen.scrollTop = screen.scrollHeight;
+}
+
+function loadStep(){
+  if(si >= steps.length){ finishSteps(); return; }
+  const st = steps[si];
+  document.getElementById('concTitle').textContent = st.title;
+  document.getElementById('concSub').textContent = st.sub;
+  document.getElementById('concepto').innerHTML = st.html;
+  println('sys', `[ paso ${si+1} ] escribe el comando que te muestra la diapositiva, o pulsa "Ver comando"`);
+  renderProgress();
+  input.value = '';
+  input.focus();
+}
+
+function runCommand(raw){
+  const s = raw.trim();
+  if(!s) return;
+  println('prompt', '$ ' + s);
+  const st = steps[si];
+  if(st.match(s.toLowerCase())){
+    st.out.forEach(line => println(line.t, line.text));
+    si++;
+    setTimeout(loadStep, 450);
+  } else {
+    println('err', 'comando no reconocido para este paso — revisa bien o pulsa "Ver comando"');
+  }
+}
+
+document.getElementById('hintBtn').onclick = () => {
+  println('sys', 'comando sugerido → ' + steps[si].cmd);
+  input.value = steps[si].cmd;
+};
+document.getElementById('skipBtn').onclick = () => {
+  println('sys', '(paso saltado)');
+  runCommand(steps[si].cmd);
+};
+document.getElementById('resetBtn').onclick = () => {
+  si = 0; screen.innerHTML = '';
+  println('sys', '=== simulación reiniciada ===');
+  loadStep();
+};
+input.addEventListener('keydown', e => {
+  if(e.key === 'Enter'){ runCommand(input.value); }
 });
 
-function moreSpecific(prefix){
-  const [ip, len] = prefix.split('/');
-  return `${ip}/${parseInt(len,10)+1}`;
+function finishSteps(){
+  println('sys', '=== todos los pasos completados — pasando al repaso ===');
+  document.getElementById('concTitle').textContent = 'Listo';
+  document.getElementById('concSub').textContent = '';
+  document.getElementById('concepto').innerHTML = 'Bajen a la sección de <b>Repaso puntuado</b> para terminar el laboratorio.';
+  document.getElementById('quizwrap').style.display = 'block';
+  document.getElementById('quizwrap').scrollIntoView({behavior:'smooth'});
+  loadQuestion();
 }
-function lessSpecific(prefix){
-  const [ip, len] = prefix.split('/');
-  return `${ip}/${Math.max(parseInt(len,10)-1, 1)}`;
+
+function loadQuestion(){
+  if(qi >= quiz.length){ showFinal(); return; }
+  const q = quiz[qi];
+  const catLabel = q.cat === 'exam' ? '<span class="tag exam">Teoría</span>' : '<span class="tag cmd">Comando</span>';
+  document.getElementById('qtext').innerHTML = `${catLabel}<br><br>(${qi+1}/${quiz.length}) ${q.q}`;
+  document.getElementById('qscore').textContent = `puntaje: ${score}/${quiz.length}`;
+  document.getElementById('qexplain').style.display = 'none';
+  document.getElementById('nextQBtn').style.display = 'none';
+  const box = document.getElementById('qoptions');
+  box.innerHTML = '';
+  q.opts.forEach((opt, idx) => {
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = opt;
+    b.onclick = () => answer(idx, b);
+    box.appendChild(b);
+  });
 }
-function shuffle(arr){
-  const a = arr.slice();
-  for(let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+
+function answer(idx, btn){
+  const q = quiz[qi];
+  const buttons = document.querySelectorAll('#qoptions .opt');
+  buttons.forEach(b => b.disabled = true);
+  if(idx === q.correct){
+    btn.classList.add('correct');
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    buttons[q.correct].classList.add('correct');
   }
-  return a;
-}
-function renderScore(){
-  document.getElementById('atkScore').textContent = score.attack;
-  document.getElementById('defScore').textContent = score.defense;
-  document.getElementById('totalScore').textContent = score.attack + score.defense;
+  document.getElementById('qexplain').style.display = 'block';
+  document.getElementById('qexplain').textContent = q.exp;
+  document.getElementById('qscore').textContent = `puntaje: ${score}/${quiz.length}`;
+  document.getElementById('nextQBtn').style.display = 'inline-block';
 }
 
-function termAppend(lines){
-  const body = document.getElementById('termBody');
-  lines.forEach(l => {
-    const div = document.createElement('div');
-    div.className = 'ln ' + (l.cls || '');
-    div.textContent = l.text;
-    body.appendChild(div);
-  });
-  body.scrollTop = body.scrollHeight;
+document.getElementById('nextQBtn').onclick = () => { qi++; loadQuestion(); };
+
+function slugify(s){
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60) || 'grupo';
 }
 
-function termAnnounce(as, prefix, routerIdSuffix){
-  termAppend([
-    { cls:'prompt', text: `root@kali:~# sudo vtysh -c "configure terminal` },
-    { cls:'cmd',    text: `router bgp ${as}` },
-    { cls:'cmd',    text: ` bgp router-id 10.0.${routerIdSuffix}.1` },
-    { cls:'cmd',    text: ` network ${prefix}` },
-    { cls:'cmd',    text: ` exit` },
-    { cls:'cmd',    text: `write memory"` },
-    { cls:'prompt', text: `root@kali:~# sudo vtysh -c "show bgp ipv4 unicast"` },
-    { cls:'out',    text: `   Network          Next Hop            Metric LocPrf Weight Path` },
-    { cls:'out',    text: `*> ${prefix.padEnd(17)}0.0.0.0                  0         32768 i` },
-    { cls:'note',   text: '' }
-  ]);
+async function showFinal(){
+  document.getElementById('qcard').style.display = 'none';
+  document.getElementById('finalcard').style.display = 'block';
+  const pts40 = Math.round((score/quiz.length)*40);
+  document.getElementById('finalscore').textContent = `Grupo "${teamName}" — ${score}/${quiz.length} correctas → ${pts40}/40 puntos.`;
+
+  if(claudeDb){
+    try{
+      await claudeDb.collection('results').doc(slugify(teamName)).set({
+        team: teamName, score, total: quiz.length, pts40, ts: Date.now()
+      });
+      document.getElementById('boardWrap').style.display = 'block';
+      loadBoard();
+    }catch(e){
+      console.warn('no se pudo guardar en el tablero', e);
+    }
+  }
+
+  if(SHEET_WEBAPP_URL){
+    try{
+      await fetch(SHEET_WEBAPP_URL, {
+        method: 'POST',
+        body: JSON.stringify({ team: teamName, members: teamMembers, score, total: quiz.length, pts40 })
+      });
+    }catch(e){
+      console.warn('no se pudo enviar a la hoja de cálculo', e);
+    }
+  }
 }
 
-function termHijack(as, fakePrefix, victimAs){
-  termAppend([
-    { cls:'prompt', text: `root@kali:~# sudo vtysh -c "configure terminal` },
-    { cls:'cmd',    text: `router bgp ${as}` },
-    { cls:'cmd',    text: ` network ${fakePrefix}` },
-    { cls:'cmd',    text: ` exit` },
-    { cls:'cmd',    text: `write memory"` },
-    { cls:'prompt', text: `root@kali:~# sudo vtysh -c "show bgp ipv4 unicast"` },
-    { cls:'out',    text: `   Network          Next Hop            Metric LocPrf Weight Path` },
-    { cls:'flag',   text: `*> ${fakePrefix.padEnd(17)}0.0.0.0                  0         32768 i   <-- MAS ESPECIFICA, le gana a AS${victimAs}` },
-    { cls:'note',   text: '' }
-  ]);
+async function loadBoard(){
+  if(!claudeDb) return;
+  try{
+    const snap = await claudeDb.collection('results').orderBy('pts40','desc').limit(30).get();
+    const body = document.querySelector('#boardTable tbody');
+    body.innerHTML = '';
+    snap.docs.forEach((d, i) => {
+      const data = d.data() || {};
+      const tr = document.createElement('tr');
+      if(data.team === teamName) tr.className = 'me';
+      tr.innerHTML = `<td>${i+1}</td><td>${(data.team||'').toString().replace(/</g,'&lt;')}</td><td>${data.pts40 ?? '-'}</td>`;
+      body.appendChild(tr);
+    });
+  }catch(e){ console.warn('no se pudo leer el tablero', e); }
 }
-
-function termDefend(attackerAs, threatPrefix){
-  termAppend([
-    { cls:'prompt', text: `root@kali:~# sudo vtysh -c "show bgp ipv4 unicast" | grep "${threatPrefix.split('/')[1]}"` },
-    { cls:'flag',   text: `*> ${threatPrefix.padEnd(17)}0.0.0.0    AS${attackerAs}    <-- amenaza detectada y reportada` },
-    { cls:'note',   text: '' }
-  ]);
-}
-
-document.getElementById('joinBtn').onclick = () => {
-  const name = document.getElementById('teamName').value.trim();
-  if(!name){ document.getElementById('gateErr').textContent = 'Escriban el nombre del grupo.'; return; }
-  const asNum = parseInt(asPick.value, 10);
-  const company = COMPANIES.find(c => c.as === asNum);
-  me = { team: name, as: company.as, name: company.name, prefix: company.prefix, grupoNum: COMPANIES.indexOf(company) + 1 };
-  document.getElementById('gate').style.display = 'none';
-  document.getElementById('game').style.display = 'block';
-  document.getElementById('meBadge').textContent = `Ustedes: ${me.team} — AS${me.as} (${me.name}), bloque ${me.prefix}`;
-  renderTargets();
-  renderScore();
-};
-
-function renderTargets(){
-  const sel = document.getElementById('targetPick');
-  sel.innerHTML = '';
-  COMPANIES.filter(c => c.as !== me.as).forEach(c => {
-    const o = document.createElement('option');
-    o.value = c.as;
-    o.textContent = `AS${c.as} — ${c.name} (${c.prefix})`;
-    sel.appendChild(o);
-  });
-}
-
-document.getElementById('announceBtn').onclick = () => {
-  document.getElementById('step1').classList.add('done');
-  termAnnounce(me.as, me.prefix, me.grupoNum);
-};
-
-// ---- Paso 2: atacar (pregunta antes de ejecutar) ----
-document.getElementById('hijackBtn').onclick = () => {
-  const targetAs = parseInt(document.getElementById('targetPick').value, 10);
-  const target = COMPANIES.find(c => c.as === targetAs);
-  const correct = moreSpecific(target.prefix);
-  const decoyA = target.prefix;
-  const decoyB = lessSpecific(target.prefix);
-  const options = shuffle([correct, decoyA, decoyB]);
-
-  const quiz = document.getElementById('hijackQuiz');
-  quiz.innerHTML = `
-    <div class="rules" style="margin:0">
-      <p style="font-size:13px;margin:0 0 10px"><b>Pregunta:</b> AS${target.as} (${target.name}) tiene el bloque real <b>${target.prefix}</b>. ¿Cuál de estos prefijos deben anunciar ustedes para ganarle?</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap" id="quizOpts"></div>
-      <p id="quizFeedback" style="font-size:12.5px;margin-top:10px"></p>
-    </div>`;
-  const opts = document.getElementById('quizOpts');
-  options.forEach(opt => {
-    const b = document.createElement('button');
-    b.textContent = opt;
-    b.onclick = () => {
-      const fb = document.getElementById('quizFeedback');
-      if(opt === correct){
-        fb.style.color = '#5ef29a';
-        fb.textContent = `✓ Correcto — ${opt} es MÁS específica que ${target.prefix}, le gana.`;
-        score.attack += 10;
-        renderScore();
-        document.getElementById('step2').classList.add('done');
-        termHijack(me.as, opt, targetAs);
-        setTimeout(() => { quiz.innerHTML = ''; }, 2200);
-      } else if(opt === decoyA){
-        fb.style.color = '#ff8080';
-        fb.textContent = `✗ ${opt} es la MISMA especificidad que la real — empate, no gana sola. Prueben otra.`;
-      } else {
-        fb.style.color = '#ff8080';
-        fb.textContent = `✗ ${opt} es MENOS específica (un bloque más grande) — pierde contra la ruta real. Prueben otra.`;
-      }
-    };
-    opts.appendChild(b);
-  });
-};
-
-// ---- Paso 3: defender (se simula una amenaza real; hay que identificarla) ----
-document.getElementById('checkBtn').onclick = () => {
-  const others = COMPANIES.filter(c => c.as !== me.as);
-  const attacker = others[Math.floor(Math.random() * others.length)];
-  const randomOther = others.filter(c => c.as !== attacker.as)[0] || others[0];
-
-  const correct = moreSpecific(me.prefix);                 // amenaza real: dentro de SU bloque
-  const decoyA = moreSpecific(randomOther.prefix);          // mas especifica pero de OTRO bloque -> no les afecta a ellos
-  const decoyB = lessSpecific(me.prefix);                   // dentro de su familia pero menos especifica -> no gana
-  const options = shuffle([correct, decoyA, decoyB]);
-
-  const quiz = document.getElementById('defendQuiz');
-  quiz.innerHTML = `
-    <div class="rules" style="margin:0">
-      <p style="font-size:13px;margin:0 0 10px">Se detectaron varios anuncios en la tabla BGP. Su bloque real es <b>${me.prefix}</b>. ¿Cuál de estas rutas es una AMENAZA REAL contra ustedes?</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap" id="defOpts"></div>
-      <p id="defFeedback" style="font-size:12.5px;margin-top:10px"></p>
-    </div>`;
-  const opts = document.getElementById('defOpts');
-  options.forEach(opt => {
-    const b = document.createElement('button');
-    b.textContent = opt;
-    b.onclick = () => {
-      const fb = document.getElementById('defFeedback');
-      if(opt === correct){
-        fb.style.color = '#5ef29a';
-        fb.textContent = `✓ Correcto — ${opt} está DENTRO de su bloque y es más específica. Esa sí les roba tráfico.`;
-        score.defense += 15;
-        renderScore();
-        document.getElementById('step3').classList.add('done');
-        termDefend(attacker.as, correct);
-        setTimeout(() => { quiz.innerHTML = ''; }, 2200);
-      } else if(opt === decoyA){
-        fb.style.color = '#ff8080';
-        fb.textContent = `✗ ${opt} es más específica, pero está DENTRO del bloque de ${randomOther.name} (AS${randomOther.as}), no del suyo. No es su problema. Prueben otra.`;
-      } else {
-        fb.style.color = '#ff8080';
-        fb.textContent = `✗ ${opt} sí es parte de su familia de direcciones, pero es MENOS específica que su bloque real — no les gana nada. Prueben otra.`;
-      }
-    };
-    opts.appendChild(b);
-  });
-};
+document.getElementById('refreshBoard').onclick = loadBoard;
 </script>
 </body>
 </html>
